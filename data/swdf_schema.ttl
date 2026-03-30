@@ -1,0 +1,99 @@
+# Schéma SWDF (Semantic Web Dog Food) — SWC Ontology (simplifié pour le pipeline)
+# Source : http://data.semanticweb.org/ns/swc/ontology (2009-05-11)
+# Namespace : swc: <http://data.semanticweb.org/ns/swc/ontology#>
+
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix swc:   <http://data.semanticweb.org/ns/swc/ontology#> .
+@prefix bibtex: <http://swrc.ontoware.org/ontology#> .
+
+# ---------------------------------------------------------------
+# CLASSES
+# ---------------------------------------------------------------
+
+swc:AcademicEvent       a rdfs:Class .
+swc:ConferenceEvent     a rdfs:Class ; rdfs:subClassOf swc:AcademicEvent .
+swc:WorkshopEvent       a rdfs:Class ; rdfs:subClassOf swc:AcademicEvent .
+swc:TalkEvent           a rdfs:Class ; rdfs:subClassOf swc:AcademicEvent .
+swc:PanelEvent          a rdfs:Class ; rdfs:subClassOf swc:AcademicEvent .
+swc:TutorialEvent       a rdfs:Class ; rdfs:subClassOf swc:AcademicEvent .
+swc:SessionEvent        a rdfs:Class ; rdfs:subClassOf swc:AcademicEvent .
+
+swc:Paper               a rdfs:Class .
+swc:Poster              a rdfs:Class .
+swc:Proceedings         a rdfs:Class .
+swc:Programme           a rdfs:Class .
+swc:Call                a rdfs:Class .
+
+swc:Role                a rdfs:Class .
+swc:Presenter           a rdfs:Class ; rdfs:subClassOf swc:Role .
+swc:Chair               a rdfs:Class ; rdfs:subClassOf swc:Role .
+swc:Delegate            a rdfs:Class ; rdfs:subClassOf swc:Role .
+
+foaf:Person             a rdfs:Class .
+foaf:Organization       a rdfs:Class .
+
+# ---------------------------------------------------------------
+# PROPERTIES
+# ---------------------------------------------------------------
+
+# Événements → Documents
+swc:hasRelatedDocument  a rdf:Property ;
+    rdfs:domain swc:AcademicEvent ;
+    rdfs:range  swc:Paper .
+
+swc:relatedToEvent      a rdf:Property ;
+    rdfs:domain swc:Paper ;
+    rdfs:range  swc:AcademicEvent .
+
+# Événements → Rôles → Personnes
+swc:hasRole             a rdf:Property ;
+    rdfs:domain swc:AcademicEvent ;
+    rdfs:range  swc:Role .
+
+swc:heldBy              a rdf:Property ;
+    rdfs:domain swc:Role ;
+    rdfs:range  foaf:Person .
+
+swc:holdsRole           a rdf:Property ;
+    rdfs:domain foaf:Person ;
+    rdfs:range  swc:Role .
+
+# Sous-événements
+swc:isSubEventOf        a rdf:Property ;
+    rdfs:domain swc:AcademicEvent ;
+    rdfs:range  swc:AcademicEvent .
+
+swc:isSuperEventOf      a rdf:Property ;
+    rdfs:domain swc:AcademicEvent ;
+    rdfs:range  swc:AcademicEvent .
+
+# Conférence → Programme / Appel
+swc:hasProgramme        a rdf:Property ;
+    rdfs:domain swc:AcademicEvent ;
+    rdfs:range  swc:Programme .
+
+swc:hasCall             a rdf:Property ;
+    rdfs:domain swc:AcademicEvent ;
+    rdfs:range  swc:Call .
+
+# Conférence → Participants
+swc:hasAttendee         a rdf:Property ;
+    rdfs:domain swc:AcademicEvent ;
+    rdfs:range  foaf:Person .
+
+swc:attendeeAt          a rdf:Property ;
+    rdfs:domain foaf:Person ;
+    rdfs:range  swc:AcademicEvent .
+
+# Proceedings
+swc:proceedings         a rdf:Property ;
+    rdfs:domain swc:AcademicEvent ;
+    rdfs:range  swc:Proceedings .
+
+# Organisation → Rôle
+swc:isProvidedBy        a rdf:Property ;
+    rdfs:domain swc:Role ;
+    rdfs:range  foaf:Organization .

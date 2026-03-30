@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+notebook_test.ipynb
+
+# macOS
+.DS_Store
+src/.DS_Store
+
+# Claude
+.claude/
+
+# Output générés
+output/

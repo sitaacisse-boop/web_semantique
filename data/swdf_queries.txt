@@ -1,0 +1,137 @@
+# ============================================================
+# Requêtes SPARQL réelles extraites des logs LSQ/SWDF
+# Source : https://github.com/AKSW/LSQ (combined.swdf.log)
+# Complétées par des requêtes réalistes basées sur le schéma SWC
+# ============================================================
+
+# --- [RÉELLE - LSQ log] Q1 : Conférences avec acronyme ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+SELECT DISTINCT ?conf_uri ?conf_name ?conf_acronym WHERE {
+    ?conf_uri a swc:ConferenceEvent .
+    ?conf_uri <http://www.w3.org/2000/01/rdf-schema#label> ?conf_name .
+    ?conf_uri swc:hasAcronym ?conf_acronym .
+} ORDER BY ?conf_acronym
+
+# --- [RÉELLE - LSQ log] Q2 : Workshops non complets ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT DISTINCT ?workshop_uri ?workshop_name ?workshop_acronym WHERE {
+    ?workshop_uri a swc:WorkshopEvent .
+    ?workshop_uri rdfs:label ?workshop_name .
+    ?workshop_uri swc:hasAcronym ?workshop_acronym .
+} ORDER BY ?workshop_acronym
+
+# --- [RÉELLE - LSQ log] Q3 : Événements avec graphe complet ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+SELECT DISTINCT ?graph ?event ?event_acronym WHERE {
+    ?event swc:completeGraph ?graph .
+    ?event swc:hasAcronym ?event_acronym .
+} ORDER BY ?event
+
+# --- [RÉALISTE - schéma SWC] Q4 : Papiers présentés à une conférence ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+SELECT ?paper ?event WHERE {
+    ?paper a swc:Paper .
+    ?paper swc:relatedToEvent ?event .
+    ?event a swc:ConferenceEvent .
+}
+
+# --- [RÉALISTE] Q5 : Présentateurs et leurs talks ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+SELECT ?person ?role ?event WHERE {
+    ?person a <http://xmlns.com/foaf/0.1/Person> .
+    ?person swc:holdsRole ?role .
+    ?role a swc:Presenter .
+    ?event swc:hasRole ?role .
+    ?event a swc:TalkEvent .
+}
+
+# --- [RÉALISTE] Q6 : Talks d'une conférence avec papier ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+SELECT ?talk ?conf ?paper WHERE {
+    ?talk a swc:TalkEvent .
+    ?talk swc:isSubEventOf ?conf .
+    ?conf a swc:ConferenceEvent .
+    ?paper swc:relatedToEvent ?talk .
+    ?paper a swc:Paper .
+}
+
+# --- [RÉALISTE] Q7 : Personnes et conférences auxquelles elles assistent ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?person ?event WHERE {
+    ?person a foaf:Person .
+    ?person swc:attendeeAt ?event .
+    ?event a swc:ConferenceEvent .
+}
+
+# --- [RÉALISTE] Q8 : Sessions et leurs talks sous-événements ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+SELECT ?session ?talk WHERE {
+    ?session a swc:SessionEvent .
+    ?talk a swc:TalkEvent .
+    ?talk swc:isSubEventOf ?session .
+}
+
+# --- [RÉALISTE] Q9 : Conférence, talks et présentateurs ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?conf ?talk ?person WHERE {
+    ?conf a swc:ConferenceEvent .
+    ?talk a swc:TalkEvent .
+    ?talk swc:isSubEventOf ?conf .
+    ?role a swc:Presenter .
+    ?role swc:heldBy ?person .
+    ?person a foaf:Person .
+    ?talk swc:hasRole ?role .
+}
+
+# --- [RÉALISTE] Q10 : Workshops et leurs papiers ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+SELECT ?workshop ?paper WHERE {
+    ?workshop a swc:WorkshopEvent .
+    ?paper a swc:Paper .
+    ?paper swc:relatedToEvent ?workshop .
+}
+
+# --- [RÉALISTE] Q11 : Programme d'une conférence ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+SELECT ?event ?programme WHERE {
+    ?event a swc:AcademicEvent .
+    ?event swc:hasProgramme ?programme .
+    ?programme a swc:Programme .
+}
+
+# --- [RÉALISTE] Q12 : Conférences avec call et papiers soumis ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+SELECT ?conf ?call ?paper WHERE {
+    ?conf a swc:ConferenceEvent .
+    ?conf swc:hasCall ?call .
+    ?call a swc:Call .
+    ?paper swc:relatedToEvent ?conf .
+    ?paper a swc:Paper .
+}
+
+# --- [RÉALISTE] Q13 : Panels et conférences parents ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+SELECT ?panel ?conf WHERE {
+    ?panel a swc:PanelEvent .
+    ?panel swc:isSubEventOf ?conf .
+    ?conf a swc:ConferenceEvent .
+}
+
+# --- [RÉALISTE] Q14 : Talks et conférences (répétition pour fréquence) ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+SELECT ?talk ?conf WHERE {
+    ?talk a swc:TalkEvent .
+    ?talk swc:isSubEventOf ?conf .
+    ?conf a swc:ConferenceEvent .
+}
+
+# --- [RÉALISTE] Q15 : Papiers liés aux talks ---
+PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>
+SELECT ?paper ?talk WHERE {
+    ?paper a swc:Paper .
+    ?paper swc:relatedToEvent ?talk .
+    ?talk a swc:TalkEvent .
+}
